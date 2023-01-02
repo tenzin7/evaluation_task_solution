@@ -6,10 +6,10 @@ echo "1. Application 1"
 echo "2. Application 2"
 echo "3. Application 3"
 
-# Read the user's input
+# Reads the user's input
 read input
 
-#starts supervisor
+#Starts supervisor
 supervisord
 
 # Download the selected application(s) and start using supervisor
