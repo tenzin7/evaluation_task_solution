@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Initialize the counter to 3
 counter=3
@@ -18,43 +18,48 @@ while [ $counter -ge 1 ]; do
   # This conditional statement test the value of variable "input" against the regular expression. 
   if [[ $input =~ ^[123]+$ ]]; then
     
-    #Creating Evaluation_Task_Dir directory to store all the files in HOME dir
+    #Creating an evaluation directory to store all the files in it, in HOME directory
     mkdir $HOME/Evaluation_Task_Dir/
 
-    #Creating supervisord.conf file by copying the output of echo_supervisord_conf
-    echo_supervisord_conf > $HOME/Evaluation_Task_Dir/supervisord.conf 
+    #Variable to hold the path to Evaluation Directory
+    Evaluataion_DIR="$HOME/Evaluation_Task_Dir"
+
+    #Creating supervisord.conf file in our Evaluation Directory by copying the output of echo_supervisord_conf
+    echo_supervisord_conf > $Evaluataion_DIR/supervisord.conf
+
+    #Variable to hold the path to supervisor configuration file
+    conf_file="$Evaluataion_DIR/supervisord.conf" 
     
-    #Editing supervisord.conf file to add the applications to the configuration file which needs to be run by supervisor.
-    
+    #Editing supervisord.conf file to add the applications to the configuration file which will be managed by supervisor.
     #Supervisor configurations for Application1
-    echo "" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "[program:Application1]" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "command=$HOME/Evaluation_Task_Dir/Application1" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autostart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autorestart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "stderr_logfile=$HOME/Evaluation_Task_Dir/Application1.err" >> $HOME/Evaluation_Task_Dir/supervisord.conf 
-    echo "stdout_logfile=$HOME/Evaluation_Task_Dir/Application1.out" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "" >> $HOME/Evaluation_Task_Dir/supervisord.conf
+    echo "" >> $conf_file
+    echo "[program:Application1]" >> $conf_file
+    echo "command=$Evaluataion_DIR/Application1" >> $conf_file
+    echo "autostart=false" >> $conf_file
+    echo "autorestart=false" >> $conf_file
+    echo "stderr_logfile=$Evaluataion_DIR/Application1.err" >> $conf_file 
+    echo "stdout_logfile=$Evaluataion_DIR/Application1.out" >> $conf_file
+    echo "" >> $conf_file
 
     #Supervisor configurations for Application2
-    echo "[program:Application2]" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "command=$HOME/Evaluation_Task_Dir/Application2" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autostart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autorestart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "stderr_logfile=$HOME/Evaluation_Task_Dir/Application2.err" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "stdout_logfile=$HOME/Evaluation_Task_Dir/Application2.out" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "" >> $HOME/Evaluation_Task_Dir/supervisord.conf
+    echo "[program:Application2]" >> $conf_file
+    echo "command=$Evaluataion_DIR/Application2" >> $conf_file
+    echo "autostart=false" >> $conf_file
+    echo "autorestart=false" >> $conf_file
+    echo "stderr_logfile=$Evaluataion_DIR/Application2.err" >> $conf_file
+    echo "stdout_logfile=$Evaluataion_DIR/Application2.out" >> $conf_file
+    echo "" >> $conf_file
 
     #Supervisor configurations for Application3
-    echo "[program:Application3]" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "command=$HOME/Evaluation_Task_Dir/Application3" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autostart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "autorestart=false" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "stderr_logfile=$HOME/Evaluation_Task_Dir/Application3.err" >> $HOME/Evaluation_Task_Dir/supervisord.conf
-    echo "stdout_logfile=$HOME/Evaluation_Task_Dir/Application3.out" >> $HOME/Evaluation_Task_Dir/supervisord.conf 
+    echo "[program:Application3]" >> $conf_file
+    echo "command=$Evaluataion_DIR/Application3" >> $conf_file
+    echo "autostart=false" >> $conf_file
+    echo "autorestart=false" >> $conf_file
+    echo "stderr_logfile=$Evaluataion_DIR/Application3.err" >> $conf_file
+    echo "stdout_logfile=$Evaluataion_DIR/Application3.out" >> $conf_file 
     
     # Starts supervisor from the specified location
-    supervisord -c $HOME/Evaluation_Task_Dir/supervisord.conf
+    supervisord -c $conf_file
     
     # This command only updates the changes. It does not restart any of the managed applications, even if their configuration has changed. New application configurations cannot be started, neither.
     supervisorctl reread
@@ -66,11 +71,13 @@ while [ $counter -ge 1 ]; do
       case ${input:i-1:1} in
         1)
           # 'Curl' command downloads the selected application(s) from the github repo using github API & 'supervisorctl' starts Application 1
-          curl -o $HOME/Evaluation_Task_Dir/Application1  \
+          curl -o $Evaluataion_DIR/Application1  \
            -H "Accept: application/vnd.github.raw" \
            -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/tenzin7/Evaluataion-Task-applications/contents/test_app_1_darwin_arm64
-          chmod +x $HOME/Evaluation_Task_Dir/Application1
+          
+          #Giving executable permission to Application1
+          chmod +x $Evaluataion_DIR/Application1
 
           # Restarts the applications whose configuration has changed. After the update command, new application configurations becomes available to start, but do not start automatically until the supervisor service restarts or system reboots (even if autostart option is not disabled)
           supervisorctl update Application1
@@ -80,21 +87,21 @@ while [ $counter -ge 1 ]; do
           ;;
         2)
           # Downloads and starts Application 2
-          curl -o $HOME/Evaluation_Task_Dir/Application2  \
+          curl -o $Evaluataion_DIR/Application2  \
            -H "Accept: application/vnd.github.raw" \
            -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/tenzin7/Evaluataion-Task-applications/contents/test_app_2_darwin_arm64
-          chmod +x $HOME/Evaluation_Task_Dir/Application2
+          chmod +x $Evaluataion_DIR/Application2
           supervisorctl update Application2
           supervisorctl start Application2
           ;;
         3)
           # Downloads and starts Application 3
-          curl -o $HOME/Evaluation_Task_Dir/Application3  \
+          curl -o $Evaluataion_DIR/Application3  \
            -H "Accept: application/vnd.github.raw" \
            -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/tenzin7/Evaluataion-Task-applications/contents/test_app_3_darwin_arm64
-          chmod +x $HOME/Evaluation_Task_Dir/Application3
+          chmod +x $Evaluataion_DIR/Application3
           supervisorctl update Application3
           supervisorctl start Application3
           ;;
